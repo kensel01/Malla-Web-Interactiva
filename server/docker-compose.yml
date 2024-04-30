@@ -1,0 +1,44 @@
+version: '3'
+
+services:
+
+  mongo:
+    image: mongo
+    container_name: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: password
+    ports:
+      - 27017:27017
+    networks:
+      - app-network
+
+  postgres:
+    image: postgres
+    container_name: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: testdb
+    ports:
+      - 5432:5432
+    networks:
+      - app-network
+
+  app:
+    build: .
+    container_name: app
+    ports:
+      - 3000:3000
+    environment:
+      MONGO_URI: mongodb://root:password@mongo:27017/testdb
+      POSTGRES_URI: postgresql://postgres:postgres@postgres:5432/testdb
+    depends_on:
+      - mongo
+      - postgres
+    networks:
+      - app-network
+   
+networks:
+  app-network:
+    driver: bridge
